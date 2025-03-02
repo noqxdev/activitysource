@@ -54,7 +54,7 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            justify-content: center;ww
+            justify-content: center;
         }
 
         .profile img {
@@ -191,8 +191,8 @@
                     if (user.public_flags & (1 << 4)) badges.push('verified');
                     if (user.public_flags & (1 << 10)) badges.push('active-dev');  
 
-                      const badgeElements = badges.map(badge => {
-                        return `<div class="badge badge-${badge}">${badge.charAt(0).toUpperCase() + badge.slice(1).replace('-', ' ')}</div>`;
+                    const badgeElements = badges.map(badge => {
+                        return `<div class="badge badge-${badge}">${badge.charAt(0).toUpperCase() + badge.slice(1).replace('-', ' ')}</div>`; 
                     }).join('');
 
                     profileDiv.innerHTML = `
@@ -212,10 +212,8 @@
                         let imageUrl = "";
 
                         if (activity.assets && activity.assets.small_image) {
-                            // For Fortnite or other apps that use small_image
                             imageUrl = `https://cdn.discordapp.com/app-assets/${activity.application_id}/${activity.assets.small_image}.png`;
                         } else if (activity.assets && activity.assets.large_image) {
-                            // For apps that use large_image (like Spotify)
                             if (activity.assets.large_image.startsWith("spotify:")) {
                                 imageUrl = `https://i.scdn.co/image/${activity.assets.large_image.split(":")[1]}`;
                             } else {
