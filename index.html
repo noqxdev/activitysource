@@ -162,144 +162,144 @@
         <div id="activities"></div>
     </div>
 
-<script>
-    async function getSettings() {
-        try {
-            const response = await fetch('settings.json');
-            if (!response.ok) throw new Error("Failed to load settings");
-            return await response.json();
-        } catch (error) {
-            console.error("Error loading settings:", error);
-            return null;
-        }
-    }
-
-    async function fetchSteamGameIcon(appId) {
-        try {
-            // Using Steam's public API to fetch game details
-            const response = await fetch(`https://api.steampowered.com/ISteamApps/GetAppList/v2/`);
-            const data = await response.json();
-            const app = data.applist.apps.find(app => app.appid == appId);
-
-            if (app) {
-                const imageUrl = `httpscdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`;
-                return imageUrl;  // Use the header image as the game icon
-            } else {
-                return '';  // Return empty if no image is found
+    <script>
+        async function getSettings() {
+            try {
+                const response = await fetch('settings.json');
+                if (!response.ok) throw new Error("Failed to load settings");
+                return await response.json();
+            } catch (error) {
+                console.error("Error loading settings:", error);
+                return null;
             }
-        } catch (error) {
-            console.error("Error fetching Steam game icon:", error);
-            return '';
         }
-    }
-
-    async function fetchLanyardData(userId) {
-        try {
-            const response = await fetch(`https://api.lanyard.rest/v1/users/${userId}`);
-            const data = await response.json();
-
-            if (data.success) {
-                const user = data.data.discord_user;
-                const activities = data.data.activities;
-                const discordStatus = data.data.discord_status;
-                const profileDiv = document.getElementById("profile");
-                const activitiesDiv = document.getElementById("activities");
-
-                const statusMap = {
-                    "online": "status-online",
-                    "idle": "status-idle",
-                    "dnd": "status-dnd",
-                    "offline": "status-offline"
-                };
-                const statusClass = statusMap[discordStatus] || "status-offline";
-
-                const badges = [];
-                if (user.public_flags & (1 << 1)) badges.push('partner');
-                if (user.public_flags & (1 << 2)) badges.push('hypesquad');
-                if (user.public_flags & (1 << 3)) badges.push('bughunter');
-                if (user.public_flags & (1 << 4)) badges.push('verified');
-                if (user.public_flags & (1 << 10)) badges.push('active-dev');
-
-                const badgeElements = badges.map(badge => {
-                    return `<div class="badge badge-${badge}">${badge.charAt(0).toUpperCase() + badge.slice(1).replace('-', ' ')}</div>`;
-                }).join('');
-
-                profileDiv.innerHTML = `
-                    <img src="https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png" alt="Avatar">
-                    ${badgeElements}
-                    <div class="status ${statusClass}"></div>
-                    <div>
-                        <h2>${user.username}</h2>
-                    </div>
-                `;
-
-                activitiesDiv.innerHTML = "";
-                for (const activity of activities) {
-                    const activityDiv = document.createElement("div");
-                    activityDiv.classList.add("activity");
-
-                    let imageUrl = "";
-                    if (activity.assets && activity.assets.small_image) {
-                        imageUrl = `https://cdn.discordapp.com/app-assets/${activity.application_id}/${activity.assets.small_image}.png`;
-                    } else if (activity.assets && activity.assets.large_image) {
-                        if (activity.assets.large_image.startsWith("spotify:")) {
-                            imageUrl = `https://i.scdn.co/image/${activity.assets.large_image.split(":")[1]}`;
-                        } else {
-                            imageUrl = `https://cdn.discordapp.com/app-assets/${activity.application_id}/${activity.assets.large_image}.png`;
-                        }
-                    }
-
-                    // Check if this is a Steam game and get the icon
-                    if (activity.application_id) {
-                        const steamImageUrl = await fetchSteamGameIcon(activity.application_id);
-                        if (steamImageUrl) {
-                            imageUrl = steamImageUrl;  // Use the Steam game icon
-                        }
-                    }
-
-                    activityDiv.innerHTML = `
-                        ${imageUrl ? `<img src="${imageUrl}" alt="Activity Image">` : ""}
+    
+        async function fetchSteamGameIcon(appId) {
+            try {
+                // Using Steam's public API to fetch game details
+                const response = await fetch(`https://api.steampowered.com/ISteamApps/GetAppList/v2/`);
+                const data = await response.json();
+                const app = data.applist.apps.find(app => app.appid == appId);
+    
+                if (app) {
+                    const imageUrl = `httpscdn.akamai.steamstatic.com/steam/apps/${appId}/header.jpg`;
+                    return imageUrl;  // Use the header image as the game icon
+                } else {
+                    return '';  // Return empty if no image is found
+                }
+            } catch (error) {
+                console.error("Error fetching Steam game icon:", error);
+                return '';
+            }
+        }
+    
+        async function fetchLanyardData(userId) {
+            try {
+                const response = await fetch(`https://api.lanyard.rest/v1/users/${userId}`);
+                const data = await response.json();
+    
+                if (data.success) {
+                    const user = data.data.discord_user;
+                    const activities = data.data.activities;
+                    const discordStatus = data.data.discord_status;
+                    const profileDiv = document.getElementById("profile");
+                    const activitiesDiv = document.getElementById("activities");
+    
+                    const statusMap = {
+                        "online": "status-online",
+                        "idle": "status-idle",
+                        "dnd": "status-dnd",
+                        "offline": "status-offline"
+                    };
+                    const statusClass = statusMap[discordStatus] || "status-offline";
+    
+                    const badges = [];
+                    if (user.public_flags & (1 << 1)) badges.push('partner');
+                    if (user.public_flags & (1 << 2)) badges.push('hypesquad');
+                    if (user.public_flags & (1 << 3)) badges.push('bughunter');
+                    if (user.public_flags & (1 << 4)) badges.push('verified');
+                    if (user.public_flags & (1 << 10)) badges.push('active-dev');
+    
+                    const badgeElements = badges.map(badge => {
+                        return `<div class="badge badge-${badge}">${badge.charAt(0).toUpperCase() + badge.slice(1).replace('-', ' ')}</div>`;
+                    }).join('');
+    
+                    profileDiv.innerHTML = `
+                        <img src="https://cdn.discordapp.com/avatars/${user.id}/${user.avatar}.png" alt="Avatar">
+                        ${badgeElements}
+                        <div class="status ${statusClass}"></div>
                         <div>
-                            <h4>${activity.name}</h4>
-                            <p>${activity.details || "No details available"}</p>
-                            <p><strong>State:</strong> ${activity.state || "Unknown"}</p>
+                            <h2>${user.username}</h2>
                         </div>
                     `;
-
-                    activitiesDiv.appendChild(activityDiv);
+    
+                    activitiesDiv.innerHTML = "";
+                    for (const activity of activities) {
+                        const activityDiv = document.createElement("div");
+                        activityDiv.classList.add("activity");
+    
+                        let imageUrl = "";
+                        if (activity.assets && activity.assets.small_image) {
+                            imageUrl = `https://cdn.discordapp.com/app-assets/${activity.application_id}/${activity.assets.small_image}.png`;
+                        } else if (activity.assets && activity.assets.large_image) {
+                            if (activity.assets.large_image.startsWith("spotify:")) {
+                                imageUrl = `https://i.scdn.co/image/${activity.assets.large_image.split(":")[1]}`;
+                            } else {
+                                imageUrl = `https://cdn.discordapp.com/app-assets/${activity.application_id}/${activity.assets.large_image}.png`;
+                            }
+                        }
+    
+                        // Check if this is a Steam game and get the icon
+                        if (activity.application_id) {
+                            const steamImageUrl = await fetchSteamGameIcon(activity.application_id);
+                            if (steamImageUrl) {
+                                imageUrl = steamImageUrl;  // Use the Steam game icon
+                            }
+                        }
+    
+                        activityDiv.innerHTML = `
+                            ${imageUrl ? `<img src="${imageUrl}" alt="Activity Image">` : ""}
+                            <div>
+                                <h4>${activity.name}</h4>
+                                <p>${activity.details || "No details available"}</p>
+                                <p><strong>State:</strong> ${activity.state || "Unknown"}</p>
+                            </div>
+                        `;
+    
+                        activitiesDiv.appendChild(activityDiv);
+                    }
+                } else {
+                    console.error("Error fetching Lanyard data");
                 }
-            } else {
-                console.error("Error fetching Lanyard data");
+            } catch (error) {
+                console.error("Fetch error:", error);
             }
-        } catch (error) {
-            console.error("Fetch error:", error);
         }
-    }
-
-    // Load settings and fetch data with the dynamic user id
-    (async function init() {
-        const settings = await getSettings();
-        if (settings && settings.userid) {
-            fetchLanyardData(settings.userid);
-        } else {
-            console.error("User id not found in settings.");
-        }
-    })();
-
-    // Container tilt effect
-    const container = document.querySelector('.container');
-    container.addEventListener('mousemove', (e) => {
-        const { offsetWidth: width, offsetHeight: height } = container;
-        const { offsetX: x, offsetY: y } = e;
-        const moveX = (x / width) * 10 - 5;
-        const moveY = (y / height) * 10 - 5;
-        container.style.transform = `rotateX(${moveY}deg) rotateY(${moveX}deg)`;
-    });
-    container.addEventListener('mouseleave', () => {
-        container.style.transform = 'rotateX(0deg) rotateY(0deg)';
-    });
-</script>
-
+    
+        // Load settings and fetch data with the dynamic user id
+        (async function init() {
+            const settings = await getSettings();
+            if (settings && settings.userid) {
+                fetchLanyardData(settings.userid);
+            } else {
+                console.error("User id not found in settings.");
+            }
+        })();
+    
+        // Container tilt effect
+        const container = document.querySelector('.container');
+        container.addEventListener('mousemove', (e) => {
+            const { offsetWidth: width, offsetHeight: height } = container;
+            const { offsetX: x, offsetY: y } = e;
+            const moveX = (x / width) * 10 - 5;
+            const moveY = (y / height) * 10 - 5;
+            container.style.transform = `rotateX(${moveY}deg) rotateY(${moveX}deg)`;
+        });
+        container.addEventListener('mouseleave', () => {
+            container.style.transform = 'rotateX(0deg) rotateY(0deg)';
+        });
+    </script>
+    
     </script>
     
 </body>
